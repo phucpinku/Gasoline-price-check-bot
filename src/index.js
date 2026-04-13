@@ -28,7 +28,7 @@ client.once('ready', () => {
   cron.schedule(CRON_SCHEDULE, async () => {
     console.log('Sending daily gasoline price update...');
     await sendGasolinePrices();
-  });
+  }, { timezone: "Asia/Ho_Chi_Minh"});
 });
 
 client.on('messageCreate', async (message) => {
