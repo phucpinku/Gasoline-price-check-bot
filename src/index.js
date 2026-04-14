@@ -92,7 +92,7 @@ async function sendGasolinePrices(targetChannel = null) {
   }
 
   const previousPrices = loadPreviousPrices();
-  
+
   const embed = new EmbedBuilder()
     .setTitle('⛽ GIÁ XĂNG DẦU PETROLIMEX HÔM NAY')
     .setURL('https://www.petrolimex.com.vn/')
@@ -100,13 +100,9 @@ async function sendGasolinePrices(targetChannel = null) {
     .setTimestamp()
     .setFooter({ text: 'Dữ liệu được cập nhật tự động từ Petrolimex' });
 
-  let description = '```\n' +
-    'Sản phẩm             | Vùng 1         | Vùng 2\n' +
-    '------------------------------------------------------------\n';
-
   currentPrices.forEach(item => {
     const prevItem = previousPrices ? previousPrices.find(p => p.name === item.name) : null;
-    
+
     let z1Display = item.zone1;
     let z2Display = item.zone2;
 
@@ -114,22 +110,28 @@ async function sendGasolinePrices(targetChannel = null) {
       const curZ1 = parsePrice(item.zone1);
       const prevZ1 = parsePrice(prevItem.zone1);
       const diffZ1 = curZ1 - prevZ1;
-      if (diffZ1 !== 0) z1Display += formatDiff(diffZ1);
 
       const curZ2 = parsePrice(item.zone2);
       const prevZ2 = parsePrice(prevItem.zone2);
       const diffZ2 = curZ2 - prevZ2;
-      if (diffZ2 !== 0) z2Display += formatDiff(diffZ2);
+
+      if (diffZ1 !== 0) {
+        const sign = diffZ1 > 0 ? '↗️' : '↘️';
+        z1Display = `**${item.zone1}** ${sign} \`${formatDiff(diffZ1).trim()}\``;
+      }
+
+      if (diffZ2 !== 0) {
+        const sign = diffZ2 > 0 ? '↗️' : '↘️';
+        z2Display = `**${item.zone2}** ${sign} \`${formatDiff(diffZ2).trim()}\``;
+      }
     }
 
-    const name = item.name.padEnd(20, ' ');
-    const z1 = z1Display.padEnd(14, ' ');
-    const z2 = z2Display.padEnd(14, ' ');
-    description += `${name} | ${z1} | ${z2}\n`;
+    embed.addFields({
+      name: `🔹 ${item.name}`,
+      value: `Vùng 1: ${z1Display}\nVùng 2: ${z2Display}`,
+      inline: false
+    });
   });
-
-  description += '```';
-  embed.setDescription(description);
 
   await channel.send({ embeds: [embed] });
 
