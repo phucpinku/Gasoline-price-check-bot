@@ -57,6 +57,7 @@ const client = new Client({
 const TOKEN = process.env.DISCORD_TOKEN;
 const CHANNEL_ID = process.env.CHANNEL_ID;
 const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '* * * * *';
+const ROLE_ID = process.env.ROLE_ID; // Default role ID, replace with your own if needed
 
 client.once('clientReady', () => {
   console.log(`Bot logged in as ${client.user.tag}`);
@@ -157,9 +158,8 @@ async function sendGasolinePrices(targetChannel = null, isScheduled = false) {
       inline: false
     });
   });
-// change "@everyone" to your desired role or user mention
-const roleId = "1495474904198418515"
-  await channel.send({ content: `<@&${roleId}>`, embeds: [embed] });
+
+  await channel.send({ content: `<@&${ROLE_ID}>`, embeds: [embed] });
 
   // Save for next comparison
   saveCurrentPrices(currentPrices);
