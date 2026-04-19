@@ -3,7 +3,7 @@
 A Discord bot that provides daily gasoline price updates in Vietnam by scraping data from `giaxanghomnay.com`.
 
 ## Features
--   **Daily Automatic Updates:** Sends the latest gasoline prices to a specific channel at a scheduled time (default: 8:00 AM).
+-   **Daily Automatic Updates when price change:** Sends the latest gasoline prices to a specific channel at a scheduled time (default: 8:00 AM).
 -   **On-demand Command:** Use `!gas` or `!xang` to get current prices anytime.
 -   **Formatted Output:** Prices are presented in a clean Discord Embed table.
 

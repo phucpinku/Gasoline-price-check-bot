@@ -56,28 +56,29 @@ const client = new Client({
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const CHANNEL_ID = process.env.CHANNEL_ID;
-const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '0 8 * * *';
+const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '* * * * *';
 
 client.once('clientReady', () => {
   console.log(`Bot logged in as ${client.user.tag}`);
 
   // Schedule daily gasoline price update
   cron.schedule(CRON_SCHEDULE, async () => {
-    console.log('Sending daily gasoline price update...');
-    await sendGasolinePrices();
+    console.log('Checking for daily gasoline price update...');
+    await sendGasolinePrices(null, true);
   }, { timezone: "Asia/Ho_Chi_Minh"});
 });
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
-  if (message.content.toLowerCase() === '!gas' || message.content.toLowerCase() === '!xang') {
+  const content = message.content.toLowerCase();
+  if (content === '!gas' || content === '!xang') {
     await message.channel.sendTyping();
-    await sendGasolinePrices(message.channel);
+    await sendGasolinePrices(message.channel, false);
   }
 });
 
-async function sendGasolinePrices(targetChannel = null) {
+async function sendGasolinePrices(targetChannel = null, isScheduled = false) {
   const channel = targetChannel || client.channels.cache.get(CHANNEL_ID);
 
   if (!channel) {
@@ -88,10 +89,34 @@ async function sendGasolinePrices(targetChannel = null) {
   const currentPrices = await getGasolinePrices();
 
   if (!currentPrices || currentPrices.length === 0) {
-    return channel.send('❌ Could not fetch gasoline prices at this time.');
+    if (!isScheduled) {
+      return channel.send('❌ Could not fetch gasoline prices at this time.');
+    }
+    return;
   }
 
   const previousPrices = loadPreviousPrices();
+  let hasChange = !previousPrices;
+
+  if (previousPrices) {
+    for (const item of currentPrices) {
+      const prevItem = previousPrices.find(p => p.name === item.name);
+      if (!prevItem) {
+        hasChange = true;
+        break;
+      }
+      if (parsePrice(item.zone1) !== parsePrice(prevItem.zone1) || 
+          parsePrice(item.zone2) !== parsePrice(prevItem.zone2)) {
+        hasChange = true;
+        break;
+      }
+    }
+  }
+
+  if (isScheduled && !hasChange) {
+    console.log('No price change detected. Skipping scheduled update.');
+    return;
+  }
 
   const embed = new EmbedBuilder()
     .setTitle('⛽ GIÁ XĂNG DẦU PETROLIMEX HÔM NAY')
@@ -133,7 +158,7 @@ async function sendGasolinePrices(targetChannel = null) {
     });
   });
 
-  await channel.send({ embeds: [embed] });
+  await channel.send({ content: '@everyone', embeds: [embed] });
 
   // Save for next comparison
   saveCurrentPrices(currentPrices);
