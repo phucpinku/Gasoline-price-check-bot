@@ -18,6 +18,7 @@ A Discord bot that provides daily gasoline price updates in Vietnam by scraping 
     -   Copy `.env.example` to `.env`.
     -   Fill in your `DISCORD_TOKEN` (get it from [Discord Developer Portal](https://discord.com/developers/applications)).
     -   Fill in the `CHANNEL_ID` of the channel where you want daily updates.
+    -   Fill in the `ROLE_ID` to get the bot to ping specific role.
     -   (Optional) Adjust `CRON_SCHEDULE`.
 4.  **Run the bot:**
     ```bash
