@@ -157,8 +157,9 @@ async function sendGasolinePrices(targetChannel = null, isScheduled = false) {
       inline: false
     });
   });
-// change "@xangdau" to your desired role or user mention
-  await channel.send({ content: '@xangdau', embeds: [embed] });
+// change "@everyone" to your desired role or user mention
+const roleId = "1495474904198418515"
+  await channel.send({ content: `<@&${roleId}>`, embeds: [embed] });
 
   // Save for next comparison
   saveCurrentPrices(currentPrices);
