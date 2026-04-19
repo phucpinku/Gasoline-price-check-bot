@@ -20,6 +20,13 @@ async function getGasolinePrices() {
       return null;
     }
 
+    const allowedNames = [
+      'Xăng RON 95-V',
+      'Xăng RON 95-III',
+      'Xăng E5 RON 92-II',
+      'Xăng E10 RON 95-III'
+    ];
+
     table.find('tr').each((i, el) => {
       if (i === 0) return; // Skip header
 
@@ -29,7 +36,7 @@ async function getGasolinePrices() {
         const zone1 = $(cols[3]).text().trim();
         const zone2 = $(cols[4]).text().trim();
         
-        if (name && zone1 && zone2) {
+        if (name && zone1 && zone2 && allowedNames.includes(name)) {
           prices.push({ name, zone1, zone2 });
         }
       }
